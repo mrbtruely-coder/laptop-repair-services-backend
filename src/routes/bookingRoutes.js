@@ -79,6 +79,8 @@ router.post('/book-service', async (req, res) => {
         contactMethod,
         slotDate,
         slotTime,
+        description,
+        paymentMethod,
         discountAmount,
       });
 
