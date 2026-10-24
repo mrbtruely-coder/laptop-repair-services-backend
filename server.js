@@ -32,6 +32,6 @@ getTransporter().catch((err) => {
   console.warn('Initial mailer check warning:', err.message);
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Door Step Service Backend running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Door Step Service Backend running on port ${PORT}`);
 });
