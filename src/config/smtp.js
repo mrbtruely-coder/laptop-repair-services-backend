@@ -10,19 +10,12 @@ let transporter = null;
 export async function getTransporter() {
   if (transporter) return transporter;
 
-  let rawHost = cleanEnv(process.env.BOOKINGS_EMAIL_HOST) || cleanEnv(process.env.SMTP_HOST) || 'mail.goexpertsapps.com';
-  // mail.doorstephub.com DNS points to CloudFront CDN which drops SMTP packets.
-  // The actual cPanel mail server is mail.goexpertsapps.com (103.22.175.82).
-  if (rawHost === 'mail.doorstephub.com' || rawHost === 'doorstephub.com') {
-    rawHost = 'mail.goexpertsapps.com';
-  }
-
+  let rawHost = cleanEnv(process.env.BOOKINGS_EMAIL_HOST) || cleanEnv(process.env.SMTP_HOST) || 'homeappliancerepairsservices.com';
   const host = rawHost;
   const rawPort = Number(cleanEnv(process.env.BOOKINGS_EMAIL_PORT) || cleanEnv(process.env.SMTP_PORT)) || 465;
-  // If port 465 or default, use SSL
   const port = rawPort === 587 ? 465 : rawPort;
-  const user = cleanEnv(process.env.BOOKINGS_EMAIL_USER) || cleanEnv(process.env.SMTP_USER) || 'bookings@doorstephub.com';
-  const pass = cleanEnv(process.env.BOOKINGS_EMAIL_PASS) || cleanEnv(process.env.SMTP_PASS) || 'jwT6NlDRBYh5';
+  const user = cleanEnv(process.env.BOOKINGS_EMAIL_USER) || cleanEnv(process.env.SMTP_USER) || 'bookinginfo@homeappliancerepairsservices.com';
+  const pass = cleanEnv(process.env.BOOKINGS_EMAIL_PASS) || cleanEnv(process.env.SMTP_PASS) || 'F9WA+c3eh=(Vl=af';
 
   if (host && user && pass) {
     transporter = nodemailer.createTransport({

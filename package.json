@@ -2,7 +2,6 @@
   "name": "lapservice-backend",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "main": "server.js",
   "scripts": {
     "build": "npm install",

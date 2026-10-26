@@ -17,6 +17,8 @@ function getRawDigits(rawPhone) {
 
 /**
  * Customer Booking Confirmation Email Template
+ * Fully responsive across all devices (Mobile, Tablet, Desktop)
+ * Industry Standard Level Footer with Doorstep Hub App Store & Play Store links
  */
 export function generateBookingEmailHtml({
   fullName = 'Valued Customer',
@@ -32,62 +34,141 @@ export function generateBookingEmailHtml({
   slotTime = '',
   description = '',
   paymentMethod = '',
-  discountAmount = 150,
+  discountAmount = 0,
 }) {
   const formattedPhone = formatPhoneDisplay(phone);
-  const paymentModeLabel =
-    paymentMethod === 'doorstep_upi'
-      ? 'Doorstep UPI (Pay After Service)'
-      : 'Doorstep Cash / Pay After Service';
+  const paymentModeLabel = 'Cash on Delivery (Pay After Service)';
+
+  const playStoreUrl = process.env.PLAY_STORE_URL || 'https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share';
+  const appStoreUrl = process.env.APP_STORE_URL || 'https://apps.apple.com/in/app/doorstep-hub-all-your-needs/id6475340236';
 
   return `
     <!DOCTYPE html>
-    <html>
+    <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
     <head>
       <meta charset="utf-8">
-      <title>Booking Confirmation - Door Step Service</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="x-apple-disable-message-reformatting">
+      <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+      <title>Booking Confirmation - Laptop Repairs & Services</title>
+      <style>
+        /* Base reset */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+        
+        /* Device responsive styling */
+        @media only screen and (max-width: 620px) {
+          .email-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 0px !important;
+          }
+          .outer-wrapper {
+            padding: 8px 4px !important;
+          }
+          .header-cell {
+            padding: 20px 14px !important;
+          }
+          .content-cell {
+            padding: 18px 14px !important;
+          }
+          .brand-logo {
+            max-height: 42px !important;
+          }
+          .brand-title {
+            font-size: 19px !important;
+          }
+          .ticket-number {
+            font-size: 19px !important;
+          }
+          .detail-table td {
+            padding: 8px 6px !important;
+            font-size: 12px !important;
+          }
+          .detail-label-col {
+            width: 42% !important;
+          }
+          .app-download-cell {
+            padding: 16px 12px !important;
+          }
+          .store-btn-col {
+            display: block !important;
+            width: 100% !important;
+            padding: 5px 0 !important;
+          }
+          .store-btn-table {
+            width: 100% !important;
+            max-width: 260px !important;
+            margin: 0 auto !important;
+          }
+          .cta-btn {
+            display: block !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            padding: 14px 16px !important;
+          }
+          .trust-badge-item {
+            display: block !important;
+            margin: 4px 0 !important;
+          }
+          .trust-divider {
+            display: none !important;
+          }
+        }
+      </style>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #06223A; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #FFFFFF;">
-      <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #06223A; padding: 25px 12px;">
+    <body style="margin: 0; padding: 0; background-color: #06223A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #FFFFFF; -webkit-font-smoothing: antialiased;">
+      
+      <!-- Outer Wrapper -->
+      <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #06223A; width: 100%; margin: 0 auto;">
         <tr>
-          <td align="center">
-            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 620px; background-color: #0B2D4C; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <td align="center" class="outer-wrapper" style="padding: 24px 12px;">
+            
+            <!-- Main Email Container -->
+            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" class="email-container" style="max-width: 620px; width: 100%; background-color: #0B2D4C; border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 16px; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.55);">
               
-              <!-- Header Banner -->
+              <!-- 1. Header Banner -->
               <tr>
-                <td style="background: linear-gradient(135deg, #06223A 0%, #0F3B63 100%); padding: 25px 20px; text-align: center; border-bottom: 2px solid #22C55E;">
-                  <span style="display: inline-block; background-color: #22C55E; color: #06223A; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">
-                    BOOKING CONFIRMED
-                  </span>
-                  <h1 style="margin: 8px 0 0; color: #FFFFFF; font-size: 22px; font-weight: 800;">
+                <td class="header-cell" style="background: linear-gradient(135deg, #06223A 0%, #0F3B63 100%); padding: 26px 20px; text-align: center; border-bottom: 2px solid #22C55E;">
+                  <div style="text-align: center; margin-bottom: 12px;">
+                    <img src="https://laptoprepairsservices.com/logo.png" alt="Laptop Repairs & Services" class="brand-logo" style="max-height: 50px; width: auto; max-width: 220px; vertical-align: middle; background-color: #FFFFFF; padding: 6px 14px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 14px rgba(0,0,0,0.3);" />
+                  </div>
+                  <div>
+                    <span style="display: inline-block; background-color: #22C55E; color: #06223A; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                      BOOKING CONFIRMED
+                    </span>
+                  </div>
+                  <h1 class="brand-title" style="margin: 10px 0 0; color: #FFFFFF; font-size: 22px; font-weight: 800; letter-spacing: -0.3px;">
                     LAPTOP REPAIRS & SERVICES
                   </h1>
-                  <p style="margin: 4px 0 0; color: #86EFAC; font-size: 13px;">
+                  <p style="margin: 4px 0 0; color: #86EFAC; font-size: 13px; font-weight: 500;">
                     Same-Day Doorstep Technician Dispatch in ${city}
                   </p>
                 </td>
               </tr>
 
-              <!-- Content Body -->
+              <!-- 2. Content Body -->
               <tr>
-                <td style="padding: 24px 20px;">
-                  <h2 style="margin: 0 0 10px; color: #FFFFFF; font-size: 18px;">
+                <td class="content-cell" style="padding: 24px 22px;">
+                  <h2 style="margin: 0 0 10px; color: #FFFFFF; font-size: 18px; font-weight: 700;">
                     Hello ${fullName},
                   </h2>
-                  <p style="margin: 0 0 16px; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.5;">
-                    Your service booking has been <strong>successfully registered</strong>. Our certified technician is being dispatched to your location.
+                  <p style="margin: 0 0 16px; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.55;">
+                    Your doorstep repair booking is <strong>confirmed</strong>. Our verified service engineer has been assigned to your ticket and is preparing for dispatch.
                   </p>
 
-                  <!-- Ticket Badge Box -->
-                  <div style="background-color: #06223A; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;">
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <!-- Ticket Badge Card -->
+                  <div style="background-color: #06223A; border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;">
+                    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                       <tr>
-                        <td>
-                          <span style="font-size: 10px; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); display: block;">Service Ticket ID</span>
-                          <span style="font-size: 22px; font-weight: 800; color: #22C55E; font-family: monospace;">${ticketId}</span>
+                        <td valign="middle">
+                          <span style="font-size: 10px; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); display: block; font-weight: 600; letter-spacing: 0.5px;">Service Ticket ID</span>
+                          <span class="ticket-number" style="font-size: 22px; font-weight: 800; color: #22C55E; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px;">${ticketId}</span>
                         </td>
-                        <td align="right">
-                          <span style="background-color: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); color: #86EFAC; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px;">
+                        <td align="right" valign="middle">
+                          <span style="display: inline-block; background-color: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.45); color: #86EFAC; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">
                             ACTIVE DISPATCH
                           </span>
                         </td>
@@ -95,94 +176,171 @@ export function generateBookingEmailHtml({
                     </table>
                   </div>
 
-                  <!-- Complete User Booking Details Table -->
-                  <table width="100%" border="0" cellspacing="0" cellpadding="8" style="background-color: rgba(6, 34, 58, 0.75); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; font-size: 13px; margin-bottom: 20px;">
+                  <!-- Booking Details Table -->
+                  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="10" class="detail-table" style="background-color: rgba(6, 34, 58, 0.8); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 12px; font-size: 13px; margin-bottom: 20px;">
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6); width: 38%;">Customer Name:</td>
-                      <td style="color: #FFFFFF; font-weight: bold; font-size: 14px;">${fullName}</td>
+                      <td class="detail-label-col" style="color: rgba(255, 255, 255, 0.6); width: 38%; font-weight: 500;">Customer Name:</td>
+                      <td style="color: #FFFFFF; font-weight: 700; font-size: 14px;">${fullName}</td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Mobile Number:</td>
-                      <td style="color: #FFFFFF; font-weight: bold;">${formattedPhone}</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Mobile Number:</td>
+                      <td style="color: #FFFFFF; font-weight: 700;">${formattedPhone}</td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Customer Email:</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Customer Email:</td>
                       <td style="color: #FFFFFF; font-weight: 600;">${email || 'Not provided'}</td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Service Category:</td>
-                      <td style="color: #22C55E; font-weight: 700;">${serviceName}</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Service Category:</td>
+                      <td style="color: #22C55E; font-weight: 800;">${serviceName}</td>
                     </tr>
                     ${subcategory ? `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Issue / Subcategory:</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Issue / Subcategory:</td>
                       <td style="color: #FFFFFF; font-weight: 600;">${subcategory}</td>
                     </tr>` : ''}
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">City:</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">City:</td>
                       <td style="color: #FFFFFF; font-weight: 600;">${city}</td>
                     </tr>
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Service Address / Locality:</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Service Address:</td>
                       <td style="color: #FFFFFF; font-weight: 600;">${address ? address + ', ' : ''}${city}</td>
                     </tr>
                     ${slotDate || slotTime ? `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Scheduled Slot:</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Scheduled Slot:</td>
                       <td style="color: #FFFFFF; font-weight: 600;">${slotDate || 'Today'} (${slotTime || 'Within 45-90 mins'})</td>
                     </tr>` : ''}
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Preferred Contact:</td>
-                      <td style="color: #FFFFFF; font-weight: 600; text-transform: uppercase;">${contactMethod}</td>
-                    </tr>
                     ${description ? `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Issue Description / Notes:</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Issue Description:</td>
                       <td style="color: #FAF6F0; font-style: italic;">${description}</td>
                     </tr>` : ''}
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Payment Method:</td>
-                      <td style="color: #FFFFFF; font-weight: 600;">${paymentModeLabel}</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6);">Doorstep Visit Fee:</td>
-                      <td style="color: #22C55E; font-weight: 700;">FREE (Pay After Service)</td>
-                    </tr>
                     <tr>
-                      <td style="color: rgba(255, 255, 255, 0.6);">Service Warranty:</td>
-                      <td style="color: #86EFAC; font-weight: 700;">Up to 90 Days Warranty</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Payment Mode:</td>
+                      <td style="color: #22C55E; font-weight: 700;">${paymentModeLabel}</td>
                     </tr>
                   </table>
 
-                  <!-- What happens next -->
-                  <div style="background-color: rgba(34, 197, 94, 0.1); border-left: 3px solid #22C55E; border-radius: 4px; padding: 12px 14px; margin-bottom: 20px;">
-                    <strong style="color: #22C55E; font-size: 12px;">What Happens Next?</strong>
-                    <p style="margin: 4px 0 0; color: #FFFFFF; font-size: 12px; line-height: 1.5;">
-                      1. Our local coordinator in ${city} will verify your exact location & confirm technician arrival.<br>
-                      2. Certified engineer equipped with genuine diagnostic parts visits your doorstep.<br>
-                      3. Upfront transparent pricing. Pay only after inspection/repair!
+                  <!-- What Happens Next Step Card -->
+                  <div style="background-color: rgba(34, 197, 94, 0.08); border-left: 3px solid #22C55E; border-radius: 6px; padding: 14px 16px; margin-bottom: 22px;">
+                    <strong style="color: #22C55E; font-size: 13px; display: block; margin-bottom: 4px;">What Happens Next?</strong>
+                    <p style="margin: 0; color: #FFFFFF; font-size: 12px; line-height: 1.6;">
+                      1. Our local coordinator in ${city} will verify your location & schedule arrival.<br>
+                      2. Certified engineer visits your doorstep with diagnostic toolkit & genuine parts.<br>
+                      3. Pay conveniently via Cash on Delivery only after service completion!
                     </p>
                   </div>
 
-                  <!-- Direct Support CTA -->
-                  <div style="text-align: center; padding-top: 5px;">
-                    <a href="tel:+919515661677" style="display: inline-block; background-color: #22C55E; color: #06223A; font-size: 13px; font-weight: 800; text-decoration: none; padding: 12px 28px; border-radius: 24px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);">
-                      Call Support: +91 95156 61677
+                  <!-- Direct Support Button -->
+                  <div style="text-align: center; margin-bottom: 10px;">
+                    <a href="tel:+919515661677" class="cta-btn" style="display: inline-block; background-color: #22C55E; color: #06223A; font-size: 13px; font-weight: 800; text-decoration: none; padding: 13px 32px; border-radius: 28px; box-shadow: 0 4px 16px rgba(34, 197, 94, 0.45); text-transform: uppercase; letter-spacing: 0.3px;">
+                      📞 Call Support: +91 95156 61677
                     </a>
                   </div>
 
                 </td>
               </tr>
 
-              <!-- Footer -->
+              <!-- 3. Industry Standard Doorstep Hub App Download Section -->
               <tr>
-                <td style="background-color: #06223A; padding: 16px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                  <p style="margin: 0 0 4px; color: rgba(255, 255, 255, 0.7); font-size: 11px;">
+                <td style="padding: 0 20px 24px 20px;">
+                  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #072644 0%, #0B3356 100%); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.3);">
+                    <tr>
+                      <td class="app-download-cell" style="padding: 22px 18px; text-align: center;">
+
+                        <!-- Pill Badge -->
+                        <div style="margin-bottom: 8px;">
+                          <span style="display: inline-block; background-color: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); color: #22C55E; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            📱 DOORSTEP HUB MOBILE APP
+                          </span>
+                        </div>
+
+                        <!-- App Title & Description -->
+                        <h3 style="margin: 0 0 6px 0; color: #FFFFFF; font-size: 16px; font-weight: 800; letter-spacing: -0.2px;">
+                          Track Your Service & Manage Orders on Mobile
+                        </h3>
+                        <p style="margin: 0 0 16px 0; color: rgba(255, 255, 255, 0.75); font-size: 12px; line-height: 1.5; max-width: 440px; margin-left: auto; margin-right: auto;">
+                          Download the official <strong>Doorstep Hub</strong> app to track real-time technician arrival, view service ticket status, and download verified warranty cards directly on your phone.
+                        </p>
+
+                        <!-- App Store & Google Play Responsive Buttons -->
+                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                          <tr>
+                            <!-- Google Play Button -->
+                            <td class="store-btn-col" align="center" style="padding: 5px 6px;">
+                              <a href="${playStoreUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+                                <table role="presentation" border="0" cellspacing="0" cellpadding="0" class="store-btn-table" style="background-color: #000000; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px; padding: 7px 15px; min-width: 148px; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
+                                  <tr>
+                                    <td valign="middle" style="padding-right: 10px; width: 24px;">
+                                      <img src="https://laptoprepairsservices.com/playstore-icon.png" width="22" height="24" alt="Google Play" style="display: block; border: 0;" />
+                                    </td>
+                                    <td valign="middle" align="left" style="line-height: 1.15;">
+                                      <div style="color: #94A3B8; font-size: 9px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">GET IT ON</div>
+                                      <div style="color: #FFFFFF; font-size: 13px; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Google Play</div>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </a>
+                            </td>
+
+                            <!-- Apple App Store Button -->
+                            <td class="store-btn-col" align="center" style="padding: 5px 6px;">
+                              <a href="${appStoreUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+                                <table role="presentation" border="0" cellspacing="0" cellpadding="0" class="store-btn-table" style="background-color: #000000; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px; padding: 7px 15px; min-width: 148px; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
+                                  <tr>
+                                    <td valign="middle" style="padding-right: 10px; width: 24px;">
+                                      <img src="https://laptoprepairsservices.com/appstore-icon.png" width="22" height="24" alt="App Store" style="display: block; border: 0;" />
+                                    </td>
+                                    <td valign="middle" align="left" style="line-height: 1.15;">
+                                      <div style="color: #94A3B8; font-size: 9px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Download on the</div>
+                                      <div style="color: #FFFFFF; font-size: 13px; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">App Store</div>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- 4. Industry Standard Trust Badges & Compliance Footer -->
+              <tr>
+                <td style="background-color: #06223A; padding: 20px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.12);">
+                  
+                  <!-- Trust highlights row -->
+                  <div style="margin-bottom: 10px;">
+                    <span class="trust-badge-item" style="display: inline-block; color: #86EFAC; font-size: 11px; font-weight: 700; margin: 0 8px;">
+                      ⚡ Same-Day Service
+                    </span>
+                    <span class="trust-divider" style="color: rgba(255, 255, 255, 0.25);">•</span>
+                    <span class="trust-badge-item" style="display: inline-block; color: #86EFAC; font-size: 11px; font-weight: 700; margin: 0 8px;">
+                      🛡️ Verified Technicians
+                    </span>
+                    <span class="trust-divider" style="color: rgba(255, 255, 255, 0.25);">•</span>
+                    <span class="trust-badge-item" style="display: inline-block; color: #86EFAC; font-size: 11px; font-weight: 700; margin: 0 8px;">
+                      💵 Cash on Delivery
+                    </span>
+                  </div>
+
+                  <p style="margin: 0 0 6px; color: rgba(255, 255, 255, 0.75); font-size: 11px; line-height: 1.5;">
                     Laptop Repairs & Services • Same-day Doorstep Support across Bengaluru, Vizag, Chennai & Hyderabad
                   </p>
-                  <p style="margin: 0; color: rgba(255, 255, 255, 0.4); font-size: 10px;">
-                    © 2026 Door Step Service. All rights reserved.
+                  
+                  <p style="margin: 0 0 8px; color: rgba(255, 255, 255, 0.5); font-size: 10px;">
+                    Helpline: <a href="tel:+919515661677" style="color: #22C55E; text-decoration: none; font-weight: 700;">+91 95156 61677</a> | Website: <a href="https://laptoprepairsservices.com" style="color: #86EFAC; text-decoration: none;">laptoprepairsservices.com</a>
                   </p>
+
+                  <p style="margin: 0; color: rgba(255, 255, 255, 0.35); font-size: 10px;">
+                    © 2026 Laptop Repairs & Services. Powered by Doorstep Hub. All rights reserved.
+                  </p>
+
                 </td>
               </tr>
 
@@ -190,13 +348,16 @@ export function generateBookingEmailHtml({
           </td>
         </tr>
       </table>
+
     </body>
     </html>
   `;
 }
 
 /**
- * Internal Team Alert Email Template (Sent to doorstephub@gmail.com)
+ * Internal Team Alert Email Template
+ * Fully responsive for dispatchers, mobile technicians and coordinators
+ * Industry Standard Level Footer with Doorstep Hub App Links
  */
 export function generateTeamAlertEmailHtml({
   fullName = 'Customer',
@@ -216,90 +377,186 @@ export function generateTeamAlertEmailHtml({
 }) {
   const formattedPhone = formatPhoneDisplay(phone);
   const whatsappDigits = getRawDigits(phone);
-  const paymentModeLabel =
-    paymentMethod === 'doorstep_upi'
-      ? 'Doorstep UPI (Pay After Service)'
-      : 'Doorstep Cash / Pay After Service';
+  const paymentModeLabel = 'Cash on Delivery (Pay After Service)';
+
+  const playStoreUrl = process.env.PLAY_STORE_URL || 'https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share';
+  const appStoreUrl = process.env.APP_STORE_URL || 'https://apps.apple.com/in/app/doorstep-hub-all-your-needs/id6475340236';
 
   return `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
-      <title>NEW BOOKING: ${ticketId}</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>NEW BOOKING ALERT: ${ticketId}</title>
+      <style>
+        @media only screen and (max-width: 620px) {
+          .team-container {
+            width: 100% !important;
+            border-radius: 0 !important;
+          }
+          .action-btn {
+            display: block !important;
+            width: 100% !important;
+            margin: 6px 0 !important;
+            box-sizing: border-box !important;
+            text-align: center !important;
+          }
+          .store-btn-col {
+            display: block !important;
+            width: 100% !important;
+            padding: 5px 0 !important;
+          }
+          .store-btn-table {
+            width: 100% !important;
+            max-width: 250px !important;
+            margin: 0 auto !important;
+          }
+        }
+      </style>
     </head>
-    <body style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 16px; color: #333;">
-      <table style="max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 10px; border: 2px solid #22C55E; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        <tr style="background-color: #06223A; color: #ffffff;">
-          <td style="padding: 16px 20px;">
-            <div style="font-size: 11px; font-weight: bold; color: #22C55E; text-transform: uppercase;">NEW CUSTOMER BOOKING RECEIVED</div>
-            <h2 style="margin: 4px 0 0; color: #ffffff; font-size: 19px;">Ticket #${ticketId} — ${city}</h2>
-            <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Time: ${submittedAt}</div>
-          </td>
-        </tr>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 12px; color: #333;">
+      
+      <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
-          <td style="padding: 20px;">
-            <h3 style="margin-top: 0; color: #06223A; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Customer Information</h3>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px;">
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold; width: 35%;">Customer Name:</td>
-                <td style="padding: 6px 0; font-size: 15px; font-weight: bold; color: #06223A;">${fullName}</td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">Mobile Number:</td>
-                <td style="padding: 6px 0;">
-                  <a href="tel:${phone}" style="font-size: 16px; font-weight: bold; color: #2563eb; text-decoration: none;">${formattedPhone}</a>
-                  &nbsp;|&nbsp;
-                  <a href="https://wa.me/${whatsappDigits}?text=Hello%20${encodeURIComponent(fullName)},%20we%20received%20your%20service%20booking%20#${ticketId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">WhatsApp Customer</a>
+          <td align="center">
+            
+            <table role="presentation" class="team-container" style="max-width: 620px; width: 100%; margin: 0 auto; background: #ffffff; border-radius: 10px; border: 2px solid #22C55E; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.12);">
+              
+              <!-- Header -->
+              <tr style="background-color: #06223A; color: #ffffff;">
+                <td style="padding: 18px 20px;">
+                  <div style="margin-bottom: 10px;">
+                    <img src="https://laptoprepairsservices.com/logo.png" alt="Laptop Repairs & Services" style="max-height: 40px; width: auto; background-color: #ffffff; padding: 4px 12px; border-radius: 6px; display: inline-block;" />
+                  </div>
+                  <div style="font-size: 11px; font-weight: bold; color: #22C55E; text-transform: uppercase; letter-spacing: 0.5px;">NEW CUSTOMER BOOKING RECEIVED</div>
+                  <h2 style="margin: 4px 0 0; color: #ffffff; font-size: 20px;">Ticket #${ticketId} — ${city}</h2>
+                  <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Booked at: ${submittedAt}</div>
                 </td>
               </tr>
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">Customer Email:</td>
-                <td style="padding: 6px 0;"><a href="mailto:${email}" style="color: #2563eb;">${email || 'Not provided'}</a></td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">City:</td>
-                <td style="padding: 6px 0; font-weight: bold; color: #16a34a;">${city}</td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">Full Address / Locality:</td>
-                <td style="padding: 6px 0; background: #f8fafc; padding: 6px 10px; border-radius: 4px;">${address || 'Address pending verification'}</td>
-              </tr>
-            </table>
 
-            <h3 style="color: #06223A; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Service Details</h3>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px;">
+              <!-- Body -->
               <tr>
-                <td style="padding: 6px 0; font-weight: bold; width: 35%;">Service:</td>
-                <td style="padding: 6px 0; font-weight: bold; color: #06223A;">${serviceName}</td>
-              </tr>
-              ${subcategory ? `<tr><td style="padding: 6px 0; font-weight: bold;">Subcategory:</td><td style="padding: 6px 0;">${subcategory}</td></tr>` : ''}
-              ${description ? `<tr><td style="padding: 6px 0; font-weight: bold;">Issue Description:</td><td style="padding: 6px 0; font-style: italic; background: #fffbeb; padding: 6px 8px; border-radius: 4px;">${description}</td></tr>` : ''}
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">Scheduled Slot:</td>
-                <td style="padding: 6px 0;">${slotDate || 'Today'} (${slotTime || 'Within 45-90 mins'})</td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">Preferred Contact:</td>
-                <td style="padding: 6px 0; text-transform: uppercase;">${contactMethod}</td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; font-weight: bold;">Payment Mode:</td>
-                <td style="padding: 6px 0;">${paymentModeLabel}</td>
-              </tr>
-            </table>
+                <td style="padding: 20px;">
+                  
+                  <h3 style="margin-top: 0; color: #06223A; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; font-size: 15px;">Customer Information</h3>
+                  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px;">
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold; width: 35%;">Customer Name:</td>
+                      <td style="padding: 6px 0; font-size: 15px; font-weight: bold; color: #06223A;">${fullName}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Mobile Number:</td>
+                      <td style="padding: 6px 0;">
+                        <a href="tel:${phone}" style="font-size: 16px; font-weight: bold; color: #2563eb; text-decoration: none;">${formattedPhone}</a>
+                        &nbsp;|&nbsp;
+                        <a href="https://wa.me/${whatsappDigits}?text=Hello%20${encodeURIComponent(fullName)},%20we%20received%20your%20service%20booking%20#${ticketId}" style="color: #16a34a; font-weight: bold; text-decoration: none;">WhatsApp Customer</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Customer Email:</td>
+                      <td style="padding: 6px 0;"><a href="mailto:${email}" style="color: #2563eb;">${email || 'Not provided'}</a></td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">City:</td>
+                      <td style="padding: 6px 0; font-weight: bold; color: #16a34a;">${city}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Full Address / Locality:</td>
+                      <td style="padding: 6px 0; background: #f8fafc; padding: 6px 10px; border-radius: 4px;">${address || 'Address pending verification'}</td>
+                    </tr>
+                  </table>
 
-            <div style="margin-top: 16px; text-align: center; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-              <a href="tel:${phone}" style="display: inline-block; background: #16a34a; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; margin-right: 8px;">
-                📞 Call Customer Now (${formattedPhone})
-              </a>
-              <a href="https://wa.me/${whatsappDigits}?text=Hello%20${encodeURIComponent(fullName)},%20we%20received%20your%20booking%20#${ticketId}" style="display: inline-block; background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold;">
-                💬 WhatsApp Customer
-              </a>
-            </div>
+                  <h3 style="color: #06223A; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; font-size: 15px;">Service Details</h3>
+                  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px;">
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold; width: 35%;">Service:</td>
+                      <td style="padding: 6px 0; font-weight: bold; color: #06223A;">${serviceName}</td>
+                    </tr>
+                    ${subcategory ? `<tr><td style="padding: 6px 0; font-weight: bold;">Subcategory:</td><td style="padding: 6px 0;">${subcategory}</td></tr>` : ''}
+                    ${description ? `<tr><td style="padding: 6px 0; font-weight: bold;">Issue Description:</td><td style="padding: 6px 0; font-style: italic; background: #fffbeb; padding: 6px 8px; border-radius: 4px;">${description}</td></tr>` : ''}
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Scheduled Slot:</td>
+                      <td style="padding: 6px 0;">${slotDate || 'Today'} (${slotTime || 'Within 45-90 mins'})</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Payment Mode:</td>
+                      <td style="padding: 6px 0; font-weight: bold; color: #16a34a;">${paymentModeLabel}</td>
+                    </tr>
+                  </table>
+
+                  <!-- Quick Action Buttons -->
+                  <div style="margin-top: 16px; text-align: center; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                    <a href="tel:${phone}" class="action-btn" style="display: inline-block; background: #16a34a; color: #ffffff; text-decoration: none; padding: 11px 22px; border-radius: 6px; font-weight: bold; margin: 4px;">
+                      📞 Call Customer Now (${formattedPhone})
+                    </a>
+                    <a href="https://wa.me/${whatsappDigits}?text=Hello%20${encodeURIComponent(fullName)},%20we%20received%20your%20booking%20#${ticketId}" class="action-btn" style="display: inline-block; background: #25D366; color: #ffffff; text-decoration: none; padding: 11px 22px; border-radius: 6px; font-weight: bold; margin: 4px;">
+                      💬 WhatsApp Customer
+                    </a>
+                  </div>
+
+                  <!-- Doorstep Hub App Download Section for Coordinators/Field Team -->
+                  <div style="margin-top: 20px; padding: 16px 14px; background: #06223A; border-radius: 10px; text-align: center; color: #ffffff;">
+                    <div style="font-size: 10px; font-weight: bold; color: #22C55E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+                      DOORSTEP HUB MOBILE APP
+                    </div>
+                    <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">
+                      Download the official app to manage orders and track doorstep technician progress:
+                    </div>
+                    <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                      <tr>
+                        <!-- Google Play Button -->
+                        <td class="store-btn-col" align="center" style="padding: 4px 6px;">
+                          <a href="${playStoreUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" class="store-btn-table" style="background-color: #000000; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; padding: 6px 14px; min-width: 140px;">
+                              <tr>
+                                <td valign="middle" style="padding-right: 8px;">
+                                  <img src="https://laptoprepairsservices.com/playstore-icon.png" width="20" height="22" alt="Google Play" style="display: block; border: 0;" />
+                                </td>
+                                <td valign="middle" align="left" style="line-height: 1.15;">
+                                  <div style="color: #94A3B8; font-size: 8px; text-transform: uppercase; font-weight: 600;">GET IT ON</div>
+                                  <div style="color: #FFFFFF; font-size: 12px; font-weight: bold;">Google Play</div>
+                                </td>
+                              </tr>
+                            </table>
+                          </a>
+                        </td>
+                        <!-- App Store Button -->
+                        <td class="store-btn-col" align="center" style="padding: 4px 6px;">
+                          <a href="${appStoreUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" class="store-btn-table" style="background-color: #000000; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; padding: 6px 14px; min-width: 140px;">
+                              <tr>
+                                <td valign="middle" style="padding-right: 8px;">
+                                  <img src="https://laptoprepairsservices.com/appstore-icon.png" width="20" height="22" alt="App Store" style="display: block; border: 0;" />
+                                </td>
+                                <td valign="middle" align="left" style="line-height: 1.15;">
+                                  <div style="color: #94A3B8; font-size: 8px; text-transform: uppercase; font-weight: 600;">Download on</div>
+                                  <div style="color: #FFFFFF; font-size: 12px; font-weight: bold;">App Store</div>
+                                </td>
+                              </tr>
+                            </table>
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="background-color: #f8fafc; padding: 12px 20px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b;">
+                  Laptop Repairs & Services Internal Booking Dispatch System • Powered by Doorstep Hub
+                </td>
+              </tr>
+
+            </table>
           </td>
         </tr>
       </table>
+
     </body>
     </html>
   `;

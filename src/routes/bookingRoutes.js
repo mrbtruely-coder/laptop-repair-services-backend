@@ -16,7 +16,7 @@ const SERVICE_DISPLAY_MAP = {
 router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'Door Step Service Backend API',
+    service: 'Laptop Repairs & Services Backend API',
     timestamp: new Date().toISOString(),
   });
 });
@@ -24,23 +24,21 @@ router.get('/health', (req, res) => {
 // Book Service & Send Confirmation to Customer + Alert to Team
 router.post('/book-service', async (req, res) => {
   try {
-    const {
-      fullName,
-      phone,
-      email,
-      service,
-      subcategory,
-      address,
-      city = 'Hyderabad',
-      ticketId = 'TF-' + Math.floor(100000 + Math.random() * 900000),
-      discountAmount = 150,
-      payableAmount = 0,
-      contactMethod = 'phone',
-      slotDate,
-      slotTime,
-      description,
-      paymentMethod,
-    } = req.body;
+    const fullName = req.body.fullName || req.body.name || req.body.customerName;
+    const phone = req.body.phone || req.body.mobile || req.body.customerPhone;
+    const email = req.body.email || req.body.customerEmail;
+    const service = req.body.service || req.body.serviceType;
+    const subcategory = req.body.subcategory || req.body.issueCategory || '';
+    const address = req.body.address || req.body.streetAddress || '';
+    const city = req.body.city || 'Hyderabad';
+    const ticketId = req.body.ticketId || req.body.bookingId || ('TF-' + Math.floor(100000 + Math.random() * 900000));
+    const discountAmount = req.body.discountAmount || 0;
+    const payableAmount = req.body.payableAmount || 499;
+    const contactMethod = req.body.contactMethod || 'phone';
+    const slotDate = req.body.slotDate || req.body.preferredDate || new Date().toISOString().split('T')[0];
+    const slotTime = req.body.slotTime || req.body.preferredTime || 'Within 90 Minutes (Express Dispatch)';
+    const description = req.body.description || req.body.issueDescription || req.body.notes || '';
+    const paymentMethod = req.body.paymentMethod || 'doorstep_cod';
 
     if (!fullName || !phone) {
       return res.status(400).json({
@@ -49,20 +47,22 @@ router.post('/book-service', async (req, res) => {
       });
     }
 
-    const serviceName = SERVICE_DISPLAY_MAP[service] || service || 'Doorstep IT & Appliance Repair';
+    const serviceName = SERVICE_DISPLAY_MAP[service] || req.body.serviceType || service || 'Doorstep IT & Appliance Repair';
     const transporter = await getTransporter();
 
     const fromAddress =
       cleanEnv(process.env.BOOKINGS_EMAIL_USER) ||
       cleanEnv(process.env.SMTP_FROM) ||
       cleanEnv(process.env.SMTP_USER) ||
-      'bookings@doorstephub.com';
+      'bookinginfo@homeappliancerepairsservices.com';
 
     const teamNotificationEmail =
-      cleanEnv(process.env.TEAM_NOTIFICATION_EMAIL) || 'doorstephub@gmail.com';
+      cleanEnv(process.env.TEAM_NOTIFICATION_EMAIL) || fromAddress;
 
     let customerMailSent = false;
     let teamMailSent = false;
+    let customerEmailError = null;
+    let teamEmailError = null;
     let previewUrl = null;
 
     // 1. Dispatch Confirmation Email to Customer (if email provided)
@@ -85,7 +85,7 @@ router.post('/book-service', async (req, res) => {
       });
 
       const customerMailOptions = {
-        from: `"Door Step Service" <${fromAddress}>`,
+        from: `"Laptop Repairs & Services" <${fromAddress}>`,
         to: email,
         subject: `Booking Confirmed: Doorstep Repair Dispatch (#${ticketId})`,
         html: customerEmailHtml,
@@ -97,11 +97,12 @@ router.post('/book-service', async (req, res) => {
         previewUrl = nodemailer.getTestMessageUrl(info);
         console.log(`📧 Customer confirmation email sent to ${email} (MessageId: ${info.messageId})`);
       } catch (custMailErr) {
+        customerEmailError = custMailErr.message;
         console.warn(`⚠️ Customer email dispatch failed for ${email}:`, custMailErr.message);
       }
     }
 
-    // 2. Dispatch Booking Alert to Doorstep Hub Team (doorstephub@gmail.com)
+    // 2. Dispatch Booking Alert to Team
     const teamEmailHtml = generateTeamAlertEmailHtml({
       fullName,
       phone,
@@ -119,7 +120,7 @@ router.post('/book-service', async (req, res) => {
     });
 
     const teamMailOptions = {
-      from: `"Door Step Service Bookings" <${fromAddress}>`,
+      from: `"Laptop Repairs & Services Bookings" <${fromAddress}>`,
       to: teamNotificationEmail,
       subject: `🚨 NEW BOOKING ALERT: ${fullName} - ${serviceName} (${city}) [#${ticketId}]`,
       html: teamEmailHtml,
@@ -130,17 +131,25 @@ router.post('/book-service', async (req, res) => {
       teamMailSent = true;
       console.log(`🚀 Team alert email sent to ${teamNotificationEmail} (MessageId: ${teamInfo.messageId})`);
     } catch (teamMailErr) {
+      teamEmailError = teamMailErr.message;
       console.warn(`⚠️ Team alert email dispatch failed for ${teamNotificationEmail}:`, teamMailErr.message);
     }
 
+    const successMsg = customerMailSent
+      ? `Booking #${ticketId} confirmed! Confirmation email dispatched to ${email}. Technician arriving as scheduled.`
+      : `Booking #${ticketId} confirmed! Technician coordinator will call you directly at ${phone}.`;
+
     res.json({
       success: true,
-      message: 'Booking completed successfully.',
+      message: successMsg,
       ticketId,
+      bookingId: ticketId,
       customerEmailSent: customerMailSent,
       teamEmailSent: teamMailSent,
       emailSentTo: email || null,
       teamAlertSentTo: teamNotificationEmail,
+      customerEmailError,
+      teamEmailError,
       previewUrl: previewUrl || null,
     });
   } catch (error) {
