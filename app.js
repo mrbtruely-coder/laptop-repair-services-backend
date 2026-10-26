@@ -24546,13 +24546,13 @@ var require_lib3 = __commonJS({
             if (err) {
               next(err);
             } else {
-              var corsOptions2 = assign2({}, defaults, options);
+              var corsOptions = assign2({}, defaults, options);
               var originCallback = null;
-              if (corsOptions2.origin && typeof corsOptions2.origin === "function") {
-                originCallback = corsOptions2.origin;
-              } else if (corsOptions2.origin) {
+              if (corsOptions.origin && typeof corsOptions.origin === "function") {
+                originCallback = corsOptions.origin;
+              } else if (corsOptions.origin) {
                 originCallback = function(origin, cb) {
-                  cb(null, corsOptions2.origin);
+                  cb(null, corsOptions.origin);
                 };
               }
               if (originCallback) {
@@ -24560,8 +24560,8 @@ var require_lib3 = __commonJS({
                   if (err2 || !origin) {
                     next(err2);
                   } else {
-                    corsOptions2.origin = origin;
-                    cors2(corsOptions2, req, res, next);
+                    corsOptions.origin = origin;
+                    cors2(corsOptions, req, res, next);
                   }
                 });
               } else {
@@ -38654,14 +38654,6 @@ var bookingRoutes_default = router;
 import_dotenv2.default.config();
 var app = (0, import_express2.default)();
 var PORT = process.env.PORT || 5e3;
-var corsOptions = {
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-  credentials: true
-};
-app.use((0, import_cors.default)(corsOptions));
-app.options("*", (0, import_cors.default)(corsOptions));
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -38671,6 +38663,7 @@ app.use((req, res, next) => {
   }
   next();
 });
+app.use((0, import_cors.default)());
 app.use(import_express2.default.json());
 app.use("/api", bookingRoutes_default);
 app.get("/", (req, res) => {
