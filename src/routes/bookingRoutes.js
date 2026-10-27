@@ -31,6 +31,10 @@ router.post('/book-service', async (req, res) => {
     const subcategory = req.body.subcategory || req.body.issueCategory || '';
     const address = req.body.address || req.body.streetAddress || '';
     const city = req.body.city || 'Hyderabad';
+    const subArea = req.body.subArea || req.body.area || req.body.locality || req.body.otherLocation || '';
+    const otherLocation = req.body.otherLocation || '';
+    const isOtherArea = Boolean(req.body.isOtherArea || otherLocation);
+    const displayLocation = otherLocation || subArea;
     const ticketId = req.body.ticketId || req.body.bookingId || ('TF-' + Math.floor(100000 + Math.random() * 900000));
     const discountAmount = req.body.discountAmount || 0;
     const payableAmount = req.body.payableAmount || 499;
@@ -76,6 +80,9 @@ router.post('/book-service', async (req, res) => {
         ticketId,
         address,
         city,
+        subArea: displayLocation,
+        otherLocation,
+        isOtherArea,
         contactMethod,
         slotDate,
         slotTime,
@@ -112,6 +119,9 @@ router.post('/book-service', async (req, res) => {
       ticketId,
       address,
       city,
+      subArea: displayLocation,
+      otherLocation,
+      isOtherArea,
       contactMethod,
       slotDate,
       slotTime,
@@ -119,10 +129,11 @@ router.post('/book-service', async (req, res) => {
       paymentMethod,
     });
 
+    const locationForSubject = displayLocation ? `${displayLocation}, ${city}` : city;
     const teamMailOptions = {
       from: `"Laptop Repairs & Services Bookings" <${fromAddress}>`,
       to: teamNotificationEmail,
-      subject: `🚨 NEW BOOKING ALERT: ${fullName} - ${serviceName} (${city}) [#${ticketId}]`,
+      subject: `🚨 NEW BOOKING ALERT: ${fullName} - ${serviceName} (${locationForSubject}) [#${ticketId}]`,
       html: teamEmailHtml,
     };
 

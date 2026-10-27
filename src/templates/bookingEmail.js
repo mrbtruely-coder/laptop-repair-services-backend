@@ -15,6 +15,28 @@ function getRawDigits(rawPhone) {
   return clean.length === 10 ? `91${clean}` : clean;
 }
 
+function formatFriendlyDate(dateStr) {
+  if (!dateStr) return 'Today';
+  try {
+    const parts = String(dateStr).split('-');
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const d = new Date(year, month, day);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-IN', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+      }
+    }
+  } catch (e) {}
+  return String(dateStr);
+}
+
 /**
  * Customer Booking Confirmation Email Template
  * Fully responsive across all devices (Mobile, Tablet, Desktop)
@@ -29,6 +51,9 @@ export function generateBookingEmailHtml({
   ticketId = 'TF-000000',
   address = '',
   city = 'Hyderabad',
+  subArea = '',
+  otherLocation = '',
+  isOtherArea = false,
   contactMethod = 'phone',
   slotDate = '',
   slotTime = '',
@@ -41,6 +66,12 @@ export function generateBookingEmailHtml({
 
   const playStoreUrl = process.env.PLAY_STORE_URL || 'https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share';
   const appStoreUrl = process.env.APP_STORE_URL || 'https://apps.apple.com/in/app/doorstep-hub-all-your-needs/id6475340236';
+  const PLAY_STORE_URL = playStoreUrl;
+  const APP_STORE_URL = appStoreUrl;
+  const smtpUser = process.env.BOOKINGS_EMAIL_USER || process.env.SMTP_USER || 'bookinginfo@homeappliancerepairsservices.com';
+
+  const displayLocation = otherLocation || subArea;
+  const isCustomLocation = Boolean(isOtherArea || otherLocation);
 
   return `
     <!DOCTYPE html>
@@ -144,7 +175,7 @@ export function generateBookingEmailHtml({
                     LAPTOP REPAIRS & SERVICES
                   </h1>
                   <p style="margin: 4px 0 0; color: #86EFAC; font-size: 13px; font-weight: 500;">
-                    Same-Day Doorstep Technician Dispatch in ${city}
+                    Same-Day Doorstep Technician Dispatch in ${displayLocation ? `${displayLocation}, ` : ''}${city}
                   </p>
                 </td>
               </tr>
@@ -203,14 +234,26 @@ export function generateBookingEmailHtml({
                       <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">City:</td>
                       <td style="color: #FFFFFF; font-weight: 600;">${city}</td>
                     </tr>
+                    ${displayLocation ? `
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Area / Locality:</td>
+                      <td style="color: #22C55E; font-weight: 700;">
+                        ${displayLocation} ${isCustomLocation ? '<span style="color: #86EFAC; font-size: 11px; font-weight: normal; margin-left: 6px;">(Other Location)</span>' : ''}
+                      </td>
+                    </tr>` : ''}
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
                       <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Service Address:</td>
-                      <td style="color: #FFFFFF; font-weight: 600;">${address ? address + ', ' : ''}${city}</td>
+                      <td style="color: #FFFFFF; font-weight: 600;">${address ? (displayLocation && address.toLowerCase().includes(displayLocation.toLowerCase()) ? `${address}, ${city}` : `${address}, ${displayLocation ? displayLocation + ', ' : ''}${city}`) : `${displayLocation ? displayLocation + ', ' : ''}${city}`}</td>
                     </tr>
-                    ${slotDate || slotTime ? `
+                    ${slotDate ? `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Scheduled Slot:</td>
-                      <td style="color: #FFFFFF; font-weight: 600;">${slotDate || 'Today'} (${slotTime || 'Within 45-90 mins'})</td>
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Scheduled Date:</td>
+                      <td style="color: #FFFFFF; font-weight: 700;">📅 ${formatFriendlyDate(slotDate)}</td>
+                    </tr>` : ''}
+                    ${slotTime ? `
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                      <td style="color: rgba(255, 255, 255, 0.6); font-weight: 500;">Time Slot:</td>
+                      <td style="color: #22C55E; font-weight: 700;">⏰ ${slotTime}</td>
                     </tr>` : ''}
                     ${description ? `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
@@ -223,131 +266,40 @@ export function generateBookingEmailHtml({
                     </tr>
                   </table>
 
-                  <!-- What Happens Next Step Card -->
-                  <div style="background-color: rgba(34, 197, 94, 0.08); border-left: 3px solid #22C55E; border-radius: 6px; padding: 14px 16px; margin-bottom: 22px;">
-                    <strong style="color: #22C55E; font-size: 13px; display: block; margin-bottom: 4px;">What Happens Next?</strong>
-                    <p style="margin: 0; color: #FFFFFF; font-size: 12px; line-height: 1.6;">
-                      1. Our local coordinator in ${city} will verify your location & schedule arrival.<br>
-                      2. Certified engineer visits your doorstep with diagnostic toolkit & genuine parts.<br>
-                      3. Pay conveniently via Cash on Delivery only after service completion!
-                    </p>
-                  </div>
+               <!-- Industry Standard Responsive App Download Section -->
+        <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 22px 14px; text-align: center;">
+          <p style="margin: 0 0 6px; font-size: 14.5px; font-weight: 700; color: #0f172a; letter-spacing: -0.01em;">
+            Experience Faster Bookings on Doorstep Hub App
+          </p>
+          <p style="margin: 0 0 14px; font-size: 12.5px; color: #64748b; line-height: 1.4; max-width: 440px; margin-left: auto; margin-right: auto;">
+            Track your technician in real-time, get instant discounts, and manage appliance warranty.
+          </p>
+          
+          <div style="text-align: center; margin: 0 auto;">
+            <div style="display: inline-block; vertical-align: middle; margin: 5px 6px;">
+              <a href="${PLAY_STORE_URL}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" height="42" style="display: block; height: 42px; width: auto; max-width: 140px; border: 0;" />
+              </a>
+            </div>
+            <div style="display: inline-block; vertical-align: middle; margin: 5px 6px;">
+              <a href="${APP_STORE_URL}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" height="42" style="display: block; height: 42px; width: auto; max-width: 140px; border: 0;" />
+              </a>
+            </div>
+          </div>
+        </div>
 
-                  <!-- Direct Support Button -->
-                  <div style="text-align: center; margin-bottom: 10px;">
-                    <a href="tel:+919515661677" class="cta-btn" style="display: inline-block; background-color: #22C55E; color: #06223A; font-size: 13px; font-weight: 800; text-decoration: none; padding: 13px 32px; border-radius: 28px; box-shadow: 0 4px 16px rgba(34, 197, 94, 0.45); text-transform: uppercase; letter-spacing: 0.3px;">
-                      📞 Call Support: +91 95156 61677
-                    </a>
-                  </div>
-
-                </td>
-              </tr>
-
-              <!-- 3. Industry Standard Doorstep Hub App Download Section -->
-              <tr>
-                <td style="padding: 0 20px 24px 20px;">
-                  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #072644 0%, #0B3356 100%); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.3);">
-                    <tr>
-                      <td class="app-download-cell" style="padding: 22px 18px; text-align: center;">
-
-                        <!-- Pill Badge -->
-                        <div style="margin-bottom: 8px;">
-                          <span style="display: inline-block; background-color: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); color: #22C55E; font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                            📱 DOORSTEP HUB MOBILE APP
-                          </span>
-                        </div>
-
-                        <!-- App Title & Description -->
-                        <h3 style="margin: 0 0 6px 0; color: #FFFFFF; font-size: 16px; font-weight: 800; letter-spacing: -0.2px;">
-                          Track Your Service & Manage Orders on Mobile
-                        </h3>
-                        <p style="margin: 0 0 16px 0; color: rgba(255, 255, 255, 0.75); font-size: 12px; line-height: 1.5; max-width: 440px; margin-left: auto; margin-right: auto;">
-                          Download the official <strong>Doorstep Hub</strong> app to track real-time technician arrival, view service ticket status, and download verified warranty cards directly on your phone.
-                        </p>
-
-                        <!-- App Store & Google Play Responsive Buttons -->
-                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
-                          <tr>
-                            <!-- Google Play Button -->
-                            <td class="store-btn-col" align="center" style="padding: 5px 6px;">
-                              <a href="${playStoreUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
-                                <table role="presentation" border="0" cellspacing="0" cellpadding="0" class="store-btn-table" style="background-color: #000000; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px; padding: 7px 15px; min-width: 148px; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
-                                  <tr>
-                                    <td valign="middle" style="padding-right: 10px; width: 24px;">
-                                      <img src="https://laptoprepairsservices.com/playstore-icon.png" width="22" height="24" alt="Google Play" style="display: block; border: 0;" />
-                                    </td>
-                                    <td valign="middle" align="left" style="line-height: 1.15;">
-                                      <div style="color: #94A3B8; font-size: 9px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">GET IT ON</div>
-                                      <div style="color: #FFFFFF; font-size: 13px; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Google Play</div>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </a>
-                            </td>
-
-                            <!-- Apple App Store Button -->
-                            <td class="store-btn-col" align="center" style="padding: 5px 6px;">
-                              <a href="${appStoreUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
-                                <table role="presentation" border="0" cellspacing="0" cellpadding="0" class="store-btn-table" style="background-color: #000000; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px; padding: 7px 15px; min-width: 148px; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
-                                  <tr>
-                                    <td valign="middle" style="padding-right: 10px; width: 24px;">
-                                      <img src="https://laptoprepairsservices.com/appstore-icon.png" width="22" height="24" alt="App Store" style="display: block; border: 0;" />
-                                    </td>
-                                    <td valign="middle" align="left" style="line-height: 1.15;">
-                                      <div style="color: #94A3B8; font-size: 9px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Download on the</div>
-                                      <div style="color: #FFFFFF; font-size: 13px; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">App Store</div>
-                                    </td>
-                                  </tr>
-                                </table>
-                              </a>
-                            </td>
-                          </tr>
-                        </table>
-
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-
-              <!-- 4. Industry Standard Trust Badges & Compliance Footer -->
-              <tr>
-                <td style="background-color: #06223A; padding: 20px 20px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.12);">
-                  
-                  <!-- Trust highlights row -->
-                  <div style="margin-bottom: 10px;">
-                    <span class="trust-badge-item" style="display: inline-block; color: #86EFAC; font-size: 11px; font-weight: 700; margin: 0 8px;">
-                      ⚡ Same-Day Service
-                    </span>
-                    <span class="trust-divider" style="color: rgba(255, 255, 255, 0.25);">•</span>
-                    <span class="trust-badge-item" style="display: inline-block; color: #86EFAC; font-size: 11px; font-weight: 700; margin: 0 8px;">
-                      🛡️ Verified Technicians
-                    </span>
-                    <span class="trust-divider" style="color: rgba(255, 255, 255, 0.25);">•</span>
-                    <span class="trust-badge-item" style="display: inline-block; color: #86EFAC; font-size: 11px; font-weight: 700; margin: 0 8px;">
-                      💵 Cash on Delivery
-                    </span>
-                  </div>
-
-                  <p style="margin: 0 0 6px; color: rgba(255, 255, 255, 0.75); font-size: 11px; line-height: 1.5;">
-                    Laptop Repairs & Services • Same-day Doorstep Support across Bengaluru, Vizag, Chennai & Hyderabad
-                  </p>
-                  
-                  <p style="margin: 0 0 8px; color: rgba(255, 255, 255, 0.5); font-size: 10px;">
-                    Helpline: <a href="tel:+919515661677" style="color: #22C55E; text-decoration: none; font-weight: 700;">+91 95156 61677</a> | Website: <a href="https://laptoprepairsservices.com" style="color: #86EFAC; text-decoration: none;">laptoprepairsservices.com</a>
-                  </p>
-
-                  <p style="margin: 0; color: rgba(255, 255, 255, 0.35); font-size: 10px;">
-                    © 2026 Laptop Repairs & Services. Powered by Doorstep Hub. All rights reserved.
-                  </p>
-
-                </td>
-              </tr>
-
-            </table>
-          </td>
-        </tr>
-      </table>
+        <!-- Footer -->
+        <div style="border-top: 1px solid #e2e8f0; padding: 18px 20px; text-align: center; color: #64748b; font-size: 12px; background: #ffffff;">
+          <div style="margin-bottom: 8px;">
+            <span style="display: inline-block; background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid #bae6fd;">
+              🛡️ Verified &amp; Trusted by Doorstep Hub
+            </span>
+          </div>
+          &copy; ${new Date().getFullYear()} Home Appliance Repair Services. Serving Vijayawada, Guntur &amp; Nellore.<br/>
+          Helpline: <a href="tel:9515661677" style="color: #008ba6; text-decoration: none; font-weight: bold;">+91 9515661677</a> | Email: <a href="mailto:${smtpUser}" style="color: #008ba6; text-decoration: none;">${smtpUser}</a>
+        </div>
+      </div>
 
     </body>
     </html>
@@ -368,6 +320,9 @@ export function generateTeamAlertEmailHtml({
   ticketId = 'TF-000000',
   address = '',
   city = 'Hyderabad',
+  subArea = '',
+  otherLocation = '',
+  isOtherArea = false,
   contactMethod = 'phone',
   slotDate = '',
   slotTime = '',
@@ -381,6 +336,9 @@ export function generateTeamAlertEmailHtml({
 
   const playStoreUrl = process.env.PLAY_STORE_URL || 'https://play.google.com/store/apps/details?id=com.doorstephub.customer&pcampaignid=web_share';
   const appStoreUrl = process.env.APP_STORE_URL || 'https://apps.apple.com/in/app/doorstep-hub-all-your-needs/id6475340236';
+
+  const displayLocation = otherLocation || subArea;
+  const isCustomLocation = Boolean(isOtherArea || otherLocation);
 
   return `
     <!DOCTYPE html>
@@ -431,7 +389,7 @@ export function generateTeamAlertEmailHtml({
                     <img src="https://laptoprepairsservices.com/logo.png" alt="Laptop Repairs & Services" style="max-height: 40px; width: auto; background-color: #ffffff; padding: 4px 12px; border-radius: 6px; display: inline-block;" />
                   </div>
                   <div style="font-size: 11px; font-weight: bold; color: #22C55E; text-transform: uppercase; letter-spacing: 0.5px;">NEW CUSTOMER BOOKING RECEIVED</div>
-                  <h2 style="margin: 4px 0 0; color: #ffffff; font-size: 20px;">Ticket #${ticketId} — ${city}</h2>
+                  <h2 style="margin: 4px 0 0; color: #ffffff; font-size: 20px;">Ticket #${ticketId} — ${displayLocation ? `${displayLocation}, ` : ''}${city}</h2>
                   <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Booked at: ${submittedAt}</div>
                 </td>
               </tr>
@@ -462,9 +420,20 @@ export function generateTeamAlertEmailHtml({
                       <td style="padding: 6px 0; font-weight: bold;">City:</td>
                       <td style="padding: 6px 0; font-weight: bold; color: #16a34a;">${city}</td>
                     </tr>
+                    ${displayLocation ? `
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Area / Locality:</td>
+                      <td style="padding: 6px 0;">
+                        <span style="font-weight: bold; color: ${isCustomLocation ? '#92400e' : '#0369a1'}; background: ${isCustomLocation ? '#fef3c7' : '#e0f2fe'}; border: 1px solid ${isCustomLocation ? '#fde68a' : '#bae6fd'}; padding: 4px 10px; border-radius: 6px; display: inline-block; font-size: 13px;">
+                          📍 ${displayLocation} ${isCustomLocation ? '<strong style="color: #b45309; margin-left: 6px;">[OTHER LOCATION SPECIFIED BY CUSTOMER]</strong>' : ''}
+                        </span>
+                      </td>
+                    </tr>` : ''}
                     <tr>
                       <td style="padding: 6px 0; font-weight: bold;">Full Address / Locality:</td>
-                      <td style="padding: 6px 0; background: #f8fafc; padding: 6px 10px; border-radius: 4px;">${address || 'Address pending verification'}</td>
+                      <td style="padding: 6px 0; background: #f8fafc; padding: 6px 10px; border-radius: 4px; font-weight: 500;">
+                        ${address ? (displayLocation && address.toLowerCase().includes(displayLocation.toLowerCase()) ? `${address}, ${city}` : `${address}, ${displayLocation ? displayLocation + ', ' : ''}${city}`) : `${displayLocation ? displayLocation + ', ' : ''}${city}`}
+                      </td>
                     </tr>
                   </table>
 
@@ -476,10 +445,16 @@ export function generateTeamAlertEmailHtml({
                     </tr>
                     ${subcategory ? `<tr><td style="padding: 6px 0; font-weight: bold;">Subcategory:</td><td style="padding: 6px 0;">${subcategory}</td></tr>` : ''}
                     ${description ? `<tr><td style="padding: 6px 0; font-weight: bold;">Issue Description:</td><td style="padding: 6px 0; font-style: italic; background: #fffbeb; padding: 6px 8px; border-radius: 4px;">${description}</td></tr>` : ''}
+                    ${slotDate ? `
                     <tr>
-                      <td style="padding: 6px 0; font-weight: bold;">Scheduled Slot:</td>
-                      <td style="padding: 6px 0;">${slotDate || 'Today'} (${slotTime || 'Within 45-90 mins'})</td>
-                    </tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Scheduled Date:</td>
+                      <td style="padding: 6px 0; font-weight: 700; color: #06223A;">📅 ${formatFriendlyDate(slotDate)}</td>
+                    </tr>` : ''}
+                    ${slotTime ? `
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: bold;">Time Slot:</td>
+                      <td style="padding: 6px 0; font-weight: 700; color: #16a34a;">⏰ ${slotTime}</td>
+                    </tr>` : ''}
                     <tr>
                       <td style="padding: 6px 0; font-weight: bold;">Payment Mode:</td>
                       <td style="padding: 6px 0; font-weight: bold; color: #16a34a;">${paymentModeLabel}</td>
