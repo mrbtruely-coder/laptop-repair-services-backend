@@ -2,11 +2,12 @@
   "name": "lapservice-backend",
   "private": true,
   "version": "1.0.0",
-  "main": "server.js",
+  "type": "module",
+  "main": "server.source.js",
   "scripts": {
     "build": "npm install",
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.source.js",
+    "dev": "node server.source.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
